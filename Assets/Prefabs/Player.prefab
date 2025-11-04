@@ -131,8 +131,8 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 3.93
-  m_Radius: 1.49
+  m_Height: 4.95
+  m_Radius: 0.5
   m_SlopeLimit: 45
   m_StepOffset: 0.5
   m_SkinWidth: 0.08
