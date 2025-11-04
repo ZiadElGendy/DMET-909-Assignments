@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class MovementController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     private static readonly int IsMoving = Animator.StringToHash("isMoving");
 
@@ -15,6 +15,7 @@ public class MovementController : MonoBehaviour
 
     private float _gravity = -9.81f;
     private Vector3 _velocity;
+    private bool _canMove = true;
 
     void Start()
     {
@@ -35,6 +36,11 @@ public class MovementController : MonoBehaviour
     void Update()
     {
         if (controller == null) return;
+        if (!_canMove)
+        {
+            animator.SetBool(IsMoving, false);
+            return;
+        }
 
         // Read raw input (legacy Input system kept as in original)
         float moveX = Input.GetAxis("Horizontal");
@@ -85,5 +91,10 @@ public class MovementController : MonoBehaviour
         // Apply gravity
         _velocity.y += _gravity * Time.deltaTime;
         controller.Move(_velocity * Time.deltaTime);
+    }
+
+    public void SetCanMove(bool canMove)
+    {
+        _canMove = canMove;
     }
 }
