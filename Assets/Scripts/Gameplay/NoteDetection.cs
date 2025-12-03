@@ -1,110 +1,157 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NoteDetection : Singleton<NoteDetection>
 {
     public AudioSource audioSource;
+    public int sampleRate = 44100;
+    public int windowSize = 1024;
+    public float yinThreshold = 0.15f;
 
-    string _selectedDevice;
-    string[] _devices;
-    float[] _spectrumData;
+    public float detectedFrequency;
+    public int detectedMidi;
+    public string detectedNote;
 
-    static readonly string[] NoteNames12 =
-    {
-        "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
-    };
+    float[] circularBuffer;
+    int head;
+    string selectedDevice = "";
 
     void Start()
     {
-        _devices = Microphone.devices;
-        _selectedDevice = _devices.Length > 0 ? _devices[0] : null;
+        audioSource.loop = true;
+        audioSource.mute = true;
 
-        _spectrumData = new float[2048];
-
+        circularBuffer = new float[sampleRate * 2];
     }
 
-    void Update()
+    public void SelectDevice(string device)
     {
-        if (_selectedDevice == null)
-            return;
-
-        audioSource.GetSpectrumData(_spectrumData, 0, FFTWindow.BlackmanHarris);
-
-        float peakFreq = GetPeakFrequency();
-        string closestNote = GetClosestNoteName(peakFreq);
-
-        Debug.Log($"Freq: {peakFreq:F2} Hz   Note: {closestNote}");
+        if (selectedDevice == device) return;
+        selectedDevice = device;
+        StartMicrophone();
     }
 
-    float GetPeakFrequency()
+    void StartMicrophone()
     {
-        int index = 0;
-        float maxVal = 0f;
+        if (Microphone.IsRecording(selectedDevice))
+            Microphone.End(selectedDevice);
 
-        for (int i = 0; i < _spectrumData.Length; i++)
+        audioSource.Stop();
+        audioSource.clip = Microphone.Start(selectedDevice, true, 1, sampleRate);
+        audioSource.Play();
+    }
+
+    void OnAudioFilterRead(float[] data, int channels)
+    {
+        int frames = data.Length / channels;
+
+        for (int f = 0; f < frames; f++)
         {
-            if (_spectrumData[i] > maxVal)
-            {
-                maxVal = _spectrumData[i];
-                index = i;
-            }
+            float s = 0f;
+            for (int c = 0; c < channels; c++)
+                s += data[f * channels + c];
+            s /= channels;
+
+            circularBuffer[head] = s;
+            head = (head + 1) % circularBuffer.Length;
         }
 
-        float freqN = index;
-        float sampleRate = AudioSettings.outputSampleRate;
-        float freq = freqN * sampleRate / (_spectrumData.Length * 2);
+        if (frames >= windowSize / 2)
+        {
+            float[] window = new float[windowSize];
+            int start = head - windowSize;
+            if (start < 0) start += circularBuffer.Length;
 
-        return freq;
+            for (int i = 0; i < windowSize; i++)
+                window[i] = circularBuffer[(start + i) % circularBuffer.Length];
+
+            float f = YIN(window, sampleRate, yinThreshold);
+            if (f > 0f)
+            {
+                detectedFrequency = f;
+                detectedMidi = FrequencyToMIDI(f);
+                detectedNote = MidiToName(detectedMidi);
+            }
+        }
     }
-
-    string MidiToName(int midi)
-    {
-        int note = midi % 12;
-        int octave = (midi / 12) - 1;
-
-        return NoteNames12[note] + octave;
-    }
-
-
-    string GetClosestNoteName(float frequency)
-    {
-        if (frequency <= 0f)
-            return "";
-
-        float midi = 69f + 12f * Mathf.Log(frequency / 440f, 2f);
-        int midiRounded = Mathf.RoundToInt(midi);
-
-        return MidiToName(midiRounded);
-    }
-
 
     void OnGUI()
     {
-        if (_devices == null)
-            return;
-
         GUILayout.BeginVertical("box");
+        GUILayout.Label("Select Microphone:");
 
-        GUILayout.Label("Audio Inputs:");
-        foreach (var d in _devices)
+        foreach (var d in Microphone.devices)
         {
             if (GUILayout.Button(d))
                 SelectDevice(d);
         }
 
+        GUILayout.Space(10);
+
+        GUILayout.Label("Frequency: " + detectedFrequency.ToString("F1") + " Hz");
+        GUILayout.Label("MIDI: " + detectedMidi);
+        GUILayout.Label("Note: " + detectedNote);
         GUILayout.EndVertical();
     }
 
-    void SelectDevice(string device)
+    int FrequencyToMIDI(float f)
     {
-        _selectedDevice = device;
+        if (f <= 0f) return -1;
+        float m = 69f + 12f * Mathf.Log(f / 440f, 2f);
+        return Mathf.Clamp(Mathf.RoundToInt(m), 0, 127);
+    }
 
-        if (audioSource.isPlaying)
-            audioSource.Stop();
+    static readonly string[] noteNames =
+        { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
-        audioSource.clip = Microphone.Start(device, true, 1, 44100);
-        while (Microphone.GetPosition(device) <= 0) { }
-        audioSource.Play();
+    string MidiToName(int midi)
+    {
+        if (midi < 0) return "";
+        int note = midi % 12;
+        int octave = (midi / 12) - 1;
+        return noteNames[note] + octave;
+    }
+
+    float YIN(float[] buffer, int sr, float threshold)
+    {
+        int size = buffer.Length;
+        int half = size / 2;
+
+        float[] diff = new float[half];
+        for (int tau = 1; tau < half; tau++)
+        {
+            float sum = 0f;
+            for (int i = 0; i < half; i++)
+            {
+                float d = buffer[i] - buffer[i + tau];
+                sum += d * d;
+            }
+            diff[tau] = sum;
+        }
+
+        float[] cmnd = new float[half];
+        float running = 0f;
+        for (int tau = 1; tau < half; tau++)
+        {
+            running += diff[tau];
+            cmnd[tau] = diff[tau] * tau / running;
+        }
+
+        int tauEstimate = -1;
+        for (int tau = 2; tau < half; tau++)
+        {
+            if (cmnd[tau] < threshold)
+            {
+                while (tau + 1 < half && cmnd[tau + 1] < cmnd[tau])
+                    tau++;
+                tauEstimate = tau;
+                break;
+            }
+        }
+
+        if (tauEstimate == -1) return -1f;
+
+        float betterTau = tauEstimate;
+        return sr / betterTau;
     }
 }
+
