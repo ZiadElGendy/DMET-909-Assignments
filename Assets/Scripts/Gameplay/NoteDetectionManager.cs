@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 public class NoteDetection : Singleton<NoteDetection>
 {
     public int sampleRate = 44100;
-    public int windowSize = 1024;
+    public int windowSize = 4096;
     public float yinThreshold = 0.15f;
 
     public float detectedFrequency;
