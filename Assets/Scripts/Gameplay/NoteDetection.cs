@@ -1,8 +1,8 @@
 using UnityEngine;
+using System.Runtime.InteropServices;
 
 public class NoteDetection : Singleton<NoteDetection>
 {
-    public AudioSource audioSource;
     public int sampleRate = 44100;
     public int windowSize = 1024;
     public float yinThreshold = 0.15f;
@@ -13,49 +13,128 @@ public class NoteDetection : Singleton<NoteDetection>
 
     float[] circularBuffer;
     int head;
-    string selectedDevice = "";
+
+    FMOD.Sound sound;
+    FMOD.System coreSystem;
+    int recordDriverIndex = 0;
+    bool isRecording = false;
+
+    uint lastRecordPos = 0;
+    float[] readBuffer;
 
     void Start()
     {
-        audioSource.loop = true;
-        audioSource.mute = true;
-
         circularBuffer = new float[sampleRate * 2];
+        readBuffer = new float[8192];
+        InitializeFMOD();
     }
 
-    public void SelectDevice(string device)
+    void InitializeFMOD()
     {
-        if (selectedDevice == device) return;
-        selectedDevice = device;
+        coreSystem = FMODUnity.RuntimeManager.CoreSystem;
+
+        if (coreSystem.hasHandle())
+        {
+            int numDrivers = 0;
+            int numConnected = 0;
+            coreSystem.getRecordNumDrivers(out numDrivers, out numConnected);
+            Debug.Log($"FMOD: Found {numConnected} recording devices");
+        }
+    }
+
+    public void SelectDevice(int deviceIndex)
+    {
+        if (isRecording && recordDriverIndex == deviceIndex) return;
+
+        recordDriverIndex = deviceIndex;
         StartMicrophone();
     }
 
     void StartMicrophone()
     {
-        if (Microphone.IsRecording(selectedDevice))
-            Microphone.End(selectedDevice);
+        StopRecording();
 
-        audioSource.Stop();
-        audioSource.clip = Microphone.Start(selectedDevice, true, 1, sampleRate);
-        audioSource.Play();
-    }
+        FMOD.CREATESOUNDEXINFO exinfo = new FMOD.CREATESOUNDEXINFO();
+        exinfo.cbsize = Marshal.SizeOf(typeof(FMOD.CREATESOUNDEXINFO));
+        exinfo.numchannels = 1;
+        exinfo.format = FMOD.SOUND_FORMAT.PCMFLOAT;
+        exinfo.defaultfrequency = sampleRate;
+        exinfo.length = (uint)(sampleRate * sizeof(float) * 5);
 
-    void OnAudioFilterRead(float[] data, int channels)
-    {
-        int frames = data.Length / channels;
+        FMOD.RESULT result = coreSystem.createSound(
+            string.Empty,
+            FMOD.MODE.LOOP_NORMAL | FMOD.MODE.OPENUSER,
+            ref exinfo,
+            out sound
+        );
 
-        for (int f = 0; f < frames; f++)
+        if (result != FMOD.RESULT.OK)
         {
-            float s = 0f;
-            for (int c = 0; c < channels; c++)
-                s += data[f * channels + c];
-            s /= channels;
-
-            circularBuffer[head] = s;
-            head = (head + 1) % circularBuffer.Length;
+            Debug.LogError($"FMOD: Failed to create sound: {result}");
+            return;
         }
 
-        if (frames >= windowSize / 2)
+        result = coreSystem.recordStart(recordDriverIndex, sound, true);
+
+        if (result != FMOD.RESULT.OK)
+        {
+            Debug.LogError($"FMOD: Failed to start recording: {result}");
+            sound.release();
+            return;
+        }
+
+        isRecording = true;
+        lastRecordPos = 0;
+
+        Debug.Log($"FMOD: Started recording on device {recordDriverIndex}");
+    }
+
+    void StopRecording()
+    {
+        if (isRecording)
+        {
+            coreSystem.recordStop(recordDriverIndex);
+            isRecording = false;
+        }
+
+        if (sound.hasHandle())
+        {
+            sound.release();
+            sound.clearHandle();
+        }
+    }
+
+    void Update()
+    {
+        if (!isRecording || !sound.hasHandle())
+            return;
+
+        uint recordPos = 0;
+        FMOD.RESULT result = coreSystem.getRecordPosition(recordDriverIndex, out recordPos);
+
+        if (result != FMOD.RESULT.OK)
+            return;
+
+        uint soundLength = 0;
+        sound.getLength(out soundLength, FMOD.TIMEUNIT.PCM);
+
+        int samplesToRead = 0;
+        if (recordPos >= lastRecordPos)
+        {
+            samplesToRead = (int)(recordPos - lastRecordPos);
+        }
+        else
+        {
+            samplesToRead = (int)(soundLength - lastRecordPos + recordPos);
+        }
+
+        if (samplesToRead > 0)
+        {
+            ProcessNewSamples(lastRecordPos, samplesToRead, soundLength);
+            lastRecordPos = recordPos;
+        }
+
+        if (head >= windowSize)
         {
             float[] window = new float[windowSize];
             int start = head - windowSize;
@@ -74,23 +153,127 @@ public class NoteDetection : Singleton<NoteDetection>
         }
     }
 
+    void ProcessNewSamples(uint startPos, int numSamples, uint soundLength)
+    {
+        int samplesProcessed = 0;
+
+        while (samplesProcessed < numSamples)
+        {
+            int samplesToReadNow = Mathf.Min(readBuffer.Length, numSamples - samplesProcessed);
+            uint currentPos = (startPos + (uint)samplesProcessed) % soundLength;
+
+            if (currentPos + samplesToReadNow > soundLength)
+            {
+                samplesToReadNow = (int)(soundLength - currentPos);
+            }
+
+            System.IntPtr ptr1, ptr2;
+            uint len1, len2;
+
+            FMOD.RESULT result = sound.@lock(
+                currentPos * sizeof(float),
+                (uint)(samplesToReadNow * sizeof(float)),
+                out ptr1, out ptr2,
+                out len1, out len2
+            );
+
+            if (result == FMOD.RESULT.OK)
+            {
+                int samples1 = (int)(len1 / sizeof(float));
+
+                if (samples1 > 0)
+                {
+                    Marshal.Copy(ptr1, readBuffer, 0, samples1);
+
+                    for (int i = 0; i < samples1; i++)
+                    {
+                        circularBuffer[head] = readBuffer[i];
+                        head = (head + 1) % circularBuffer.Length;
+                    }
+                }
+
+                if (ptr2 != System.IntPtr.Zero && len2 > 0)
+                {
+                    int samples2 = (int)(len2 / sizeof(float));
+                    Marshal.Copy(ptr2, readBuffer, 0, samples2);
+
+                    for (int i = 0; i < samples2; i++)
+                    {
+                        circularBuffer[head] = readBuffer[i];
+                        head = (head + 1) % circularBuffer.Length;
+                    }
+                }
+
+                sound.unlock(ptr1, ptr2, len1, len2);
+                samplesProcessed += samples1 + (int)(len2 / sizeof(float));
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
     void OnGUI()
     {
         GUILayout.BeginVertical("box");
         GUILayout.Label("Select Microphone:");
 
-        foreach (var d in Microphone.devices)
+        if (coreSystem.hasHandle())
         {
-            if (GUILayout.Button(d))
-                SelectDevice(d);
+            int numDrivers = 0;
+            int numConnected = 0;
+            coreSystem.getRecordNumDrivers(out numDrivers, out numConnected);
+
+            for (int i = 0; i < numConnected; i++)
+            {
+                string name;
+                System.Guid guid;
+                int systemRate;
+                FMOD.SPEAKERMODE speakerMode;
+                int speakerModeChannels;
+                FMOD.DRIVER_STATE driverState;
+
+                coreSystem.getRecordDriverInfo(
+                    i,
+                    out name,
+                    64,
+                    out guid,
+                    out systemRate,
+                    out speakerMode,
+                    out speakerModeChannels,
+                    out driverState
+                );
+
+                string buttonLabel = recordDriverIndex == i && isRecording
+                    ? $"● {name} (Recording)"
+                    : name;
+
+                if (GUILayout.Button(buttonLabel))
+                    SelectDevice(i);
+            }
         }
 
         GUILayout.Space(10);
 
-        GUILayout.Label("Frequency: " + detectedFrequency.ToString("F1") + " Hz");
-        GUILayout.Label("MIDI: " + detectedMidi);
-        GUILayout.Label("Note: " + detectedNote);
+        if (isRecording)
+        {
+            GUILayout.Label("Status: Recording");
+            GUILayout.Label("Frequency: " + detectedFrequency.ToString("F1") + " Hz");
+            GUILayout.Label("MIDI: " + detectedMidi);
+            GUILayout.Label("Note: " + detectedNote);
+        }
+        else
+        {
+            GUILayout.Label("Status: Not Recording - Select a device");
+        }
+
         GUILayout.EndVertical();
+    }
+
+    void OnDestroy()
+    {
+        StopRecording();
     }
 
     int FrequencyToMIDI(float f)
@@ -154,4 +337,3 @@ public class NoteDetection : Singleton<NoteDetection>
         return sr / betterTau;
     }
 }
-
