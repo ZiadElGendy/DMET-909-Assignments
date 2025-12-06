@@ -280,4 +280,41 @@ public class ChordProgression : ScriptableObject
 
     [Header("Chord Progression")]
     [SerializeField] public List<ChordSection> chordSections = new List<ChordSection>();
+
+    public int GetTotalBars()
+    {
+        int totalBars = 0;
+        foreach (var section in chordSections)
+        {
+            totalBars += section.durationInBars;
+        }
+        return totalBars * numLoops;
+    }
+
+    public int GetProgressionBars()
+    {
+        int totalBars = 0;
+        foreach (var section in chordSections)
+        {
+            totalBars += section.durationInBars;
+        }
+        return totalBars;
+    }
+
+    public Chord GetChordAtBar(int barIndex)
+    {
+        int barsCounted = 0;
+        foreach (var section in chordSections)
+        {
+            for (int i = 0; i < section.durationInBars; i++)
+            {
+                if (barsCounted == barIndex % GetProgressionBars())
+                {
+                    return section.GetChord();
+                }
+                barsCounted++;
+            }
+        }
+        return null;
+    }
 }
