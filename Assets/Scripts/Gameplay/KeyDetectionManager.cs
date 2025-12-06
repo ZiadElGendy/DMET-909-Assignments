@@ -69,7 +69,7 @@ public class KeyDetection : MonoBehaviour
     // Optional: GUI for debugging
     void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(10, 300, 300, 200));
+        GUILayout.BeginArea(new Rect(10, 400, 300, 200));
         GUILayout.BeginVertical("box");
         GUILayout.Label("=== Key Detection ===");
 
