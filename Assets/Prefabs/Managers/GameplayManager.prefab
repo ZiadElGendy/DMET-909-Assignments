@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 33105274360669005}
+  - component: {fileID: 5326492562910483325}
+  - component: {fileID: 6217213361322493242}
   m_Layer: 0
   m_Name: TimingDetectionManager
   m_TagString: Untagged
@@ -31,6 +33,44 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1322732539474267176}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5326492562910483325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483414858161088841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045e068a7f5e98b4d9ed97de401bb997, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bpm_: 120
+  pause_: 0
+--- !u!114 &6217213361322493242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483414858161088841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02a2012a46e14e8ab6d6bc7249d967ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bpm: 120
+  beatsPerMeasure: 4
+  windowBeforeBeat: 0.1
+  windowAfterBeat: 0.1
+  enableMetronome: 1
+  metronomeEvent:
+    Guid:
+      Data1: 1145901778
+      Data2: 1148465446
+      Data3: 1924855428
+      Data4: -284177994
+    Path: event:/Metronome
 --- !u!1 &3422969835404833419
 GameObject:
   m_ObjectHideFlags: 0
@@ -75,7 +115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4b54105df31caa4484127fb56362c51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sampleRate: 44100
+  sampleRate: 48000
   windowSize: 4096
   yinThreshold: 0.3
   detectedFrequency: 0

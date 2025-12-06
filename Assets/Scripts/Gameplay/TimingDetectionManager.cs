@@ -1,55 +1,68 @@
-using AudioHelm;
+﻿
 using UnityEngine;
 using FMODUnity;
-using FMOD.Studio;
 
-public class TimingDetectionManager : Singleton<TimingDetectionManager>
+public class TimingDetectionManager : MonoBehaviour
 {
-    public bool isInTimingWindow = false;
-    public bool metronomeEnabled = false;
+    [SerializeField] private float bpm = 120f;
+    [SerializeField] private int beatsPerMeasure = 4;
+    [SerializeField] private float windowBeforeBeat = 0.1f;
+    [SerializeField] private float windowAfterBeat = 0.1f;
+    [SerializeField] private bool enableMetronome = false;
+    [SerializeField] private EventReference metronomeEvent;
 
-    public EventReference metronomeEvent;
+    private bool isPlaying;
+    private double nextBeatTime;
+    private double lastBeatTime;
+    private double beatInterval;
+    private int currentBeat = 0;
+    public bool isOnBeat;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
+    void Start() => beatInterval = 60.0 / bpm;
 
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
-    }
-
-    public void HandleSequencedEvents(int beat)
-    {
-        switch (beat)
+        if (isPlaying && AudioSettings.dspTime >= nextBeatTime)
         {
-            case 3: //B4
-                SetTimingWindow(true);
-                break;
-            case 0: //C4
-                if(metronomeEnabled)
-                {
-                    PlayMetronomeClick();
-                }
-                break;
-            case 1: //C#4
-                SetTimingWindow(false);
-                break;
-
+            lastBeatTime = nextBeatTime;
+            currentBeat = (currentBeat + 1) % beatsPerMeasure;
+            if (enableMetronome) RuntimeManager.PlayOneShot(metronomeEvent);
+            nextBeatTime += beatInterval;
         }
-
     }
 
-    public void SetTimingWindow(bool state)
+    public void StartClock()
     {
-        isInTimingWindow = state;
+        beatInterval = 60.0 / bpm;
+        nextBeatTime = AudioSettings.dspTime + beatInterval;
+        lastBeatTime = AudioSettings.dspTime;
+        currentBeat = beatsPerMeasure - 1;
+        isPlaying = true;
     }
 
-    public void PlayMetronomeClick()
+    public void PauseClock() => isPlaying = false;
+
+    public void RestartClock() => StartClock();
+
+
+    public bool IsOnBeat()
     {
-        RuntimeManager.PlayOneShot(metronomeEvent);
+        if (!isPlaying) return false;
+
+        double currentTime = AudioSettings.dspTime;
+        double timeSinceLastBeat = currentTime - lastBeatTime;
+        double timeToNextBeat = nextBeatTime - currentTime;
+
+        isOnBeat = timeSinceLastBeat <= windowAfterBeat || timeToNextBeat <= windowBeforeBeat;
+        return isOnBeat;
     }
+
+    public bool IsOnBeat(int beatNumber)
+    {
+        return IsOnBeat() && currentBeat == beatNumber;
+    }
+
+    public int GetCurrentBeat() => currentBeat;
+
+    public float GetBeatProgress() => isPlaying ? (float)((AudioSettings.dspTime - (nextBeatTime - beatInterval)) / beatInterval) : 0f;
 }
