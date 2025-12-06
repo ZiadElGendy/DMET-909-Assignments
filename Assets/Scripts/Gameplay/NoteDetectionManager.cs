@@ -21,6 +21,9 @@ public class NoteDetection : Singleton<NoteDetection>
     // The last detected note name corresponding to detectedMidi
     public string detectedNote;
 
+    // The DSP timestamp (AudioSettings.dspTime) when the last valid note was detected
+    public double lastNoteDspTime { get; private set; } = -1.0;
+
     // Circular buffer storing recent audio samples to feed into YIN
     // Necessary to use because FMOD recording buffer is constantly being overwritten, making it difficult to handle in code
     float[] circularBuffer;
@@ -186,6 +189,8 @@ public class NoteDetection : Singleton<NoteDetection>
                 detectedFrequency = f;
                 detectedMidi = FrequencyToMIDI(f);
                 detectedNote = MidiToName(detectedMidi);
+                // record the DSP timestamp of this detection so timing logic can be applied outside
+                lastNoteDspTime = AudioSettings.dspTime;
             }
         }
     }
@@ -439,3 +444,4 @@ public class NoteDetection : Singleton<NoteDetection>
         return sr / betterTau;
     }
 }
+
