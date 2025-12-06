@@ -10,7 +10,6 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
 
     public EventReference metronomeEvent;
 
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,25 +22,25 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
         
     }
 
-    public void HandleSequencedEvents(Note note)
+    public void HandleSequencedEvents(int beat)
     {
-        Debug.Log(note.note);
-        switch (note.note)
+        switch (beat)
         {
-            case 71: //B4
+            case 3: //B4
                 SetTimingWindow(true);
                 break;
-            case 72: //C4
+            case 0: //C4
                 if(metronomeEnabled)
                 {
                     PlayMetronomeClick();
                 }
                 break;
-            case 73: //C#4
+            case 1: //C#4
                 SetTimingWindow(false);
                 break;
 
         }
+
     }
 
     public void SetTimingWindow(bool state)

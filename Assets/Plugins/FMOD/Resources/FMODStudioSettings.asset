@@ -390,8 +390,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: FMOD/TakeAWalk.fspro
-  sourceBankPath: FMOD/Build
+  sourceProjectPath: ../FMOD/TakeAWalk.fspro
+  sourceBankPath: ../FMOD/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -401,8 +401,9 @@ MonoBehaviour:
   EncryptionKey: 
   ImportType: 0
   TargetAssetPath: FMODBanks
-  TargetBankFolder: 
+  TargetBankFolder: ../../FMOD/Build/Desktop
   EventLinkage: 0
+  SerializeGUIDsOnly: 0
   LoggingLevel: 2
   SpeakerModeSettings: []
   SampleRateSettings: []
@@ -412,8 +413,10 @@ MonoBehaviour:
   VirtualChannelSettings: []
   RealChannelSettings: []
   Plugins: []
-  MasterBanks: []
-  Banks: []
+  MasterBanks:
+  - Master
+  Banks:
+  - SFX
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
@@ -425,7 +428,7 @@ MonoBehaviour:
   EnableErrorCallback: 0
   SharedLibraryUpdateStage: 0
   SharedLibraryTimeSinceStart: 0
-  CurrentVersion: 131634
+  CurrentVersion: 131857
   HideSetupWizard: 1
   LastEventReferenceScanVersion: 131634
   Platforms:

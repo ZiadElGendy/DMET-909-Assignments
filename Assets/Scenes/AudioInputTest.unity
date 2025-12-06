@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 1250159303}
   - component: {fileID: 1250159305}
   - component: {fileID: 1250159306}
+  - component: {fileID: 1250159307}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -383,6 +384,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nonRigidbodyVelocity: 0
   attenuationObject: {fileID: 0}
+--- !u!81 &1250159307
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250159301}
+  m_Enabled: 1
+--- !u!83 &1738530657
+AudioClip:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: helm
+  m_LoadType: 0
+  m_Channels: 1
+  m_Frequency: 48000
+  m_BitsPerSample: 32
+  m_Length: 0
+  m_IsTrackerFormat: 0
+  m_Ambisonic: 0
+  m_SubsoundIndex: 0
+  m_PreloadAudioData: 1
+  m_LoadInBackground: 0
+  m_Legacy3D: 0
+  m_Resource:
+    m_Source: 
+    m_Offset: 0
+    m_Size: 0
+  m_CompressionFormat: 0
+  m_EditorResource:
+    m_Source: 
+    m_Offset: 0
+    m_Size: 0
+  m_EditorCompressionFormat: 0
 --- !u!1 &1990581568 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1483414858161088841, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
@@ -403,7 +440,7 @@ MonoBehaviour:
   noteOnEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1990581575}
+      - m_Target: {fileID: 1990581577}
         m_TargetAssemblyTypeName: TimingDetectionManager, Assembly-CSharp
         m_MethodName: HandleSequencedEvents
         m_Mode: 0
@@ -499,22 +536,22 @@ MonoBehaviour:
   - notes:
     - note_: 71
       start_: 3
-      end_: 4
+      end_: 3.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 71
       start_: 7
-      end_: 8
+      end_: 7.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 71
       start_: 11
-      end_: 12
+      end_: 11.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 71
       start_: 15
-      end_: 16
+      end_: 15.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
   - notes:
@@ -525,38 +562,38 @@ MonoBehaviour:
       parent: {fileID: 1990581571}
     - note_: 72
       start_: 4
-      end_: 5
+      end_: 4.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 72
       start_: 8
-      end_: 9
+      end_: 8.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 72
       start_: 12
-      end_: 13
+      end_: 12.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
   - notes:
     - note_: 73
       start_: 1
-      end_: 2
+      end_: 1.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 73
       start_: 5
-      end_: 6
+      end_: 5.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 73
       start_: 9
-      end_: 10
+      end_: 9.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
     - note_: 73
       start_: 13
-      end_: 14
+      end_: 13.15
       velocity_: 0.8
       parent: {fileID: 1990581571}
   - notes: []
@@ -613,7 +650,7 @@ MonoBehaviour:
   - notes: []
   - notes: []
   - notes: []
-  scrollPosition: {x: 0, y: 893}
+  scrollPosition: {x: 0, y: 413}
   autoScroll: 0
   division: 1
   zoom: 0
@@ -645,7 +682,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 1738530657}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -745,7 +782,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bpm_: 120
   pause_: 0
---- !u!114 &1990581575
+--- !u!114 &1990581577
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -759,7 +796,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isInTimingWindow: 0
   metronomeEnabled: 0
-  metronomeEvent: 
+  metronomeEvent:
+    Guid:
+      Data1: 1145901778
+      Data2: 1148465446
+      Data3: 1924855428
+      Data4: -284177994
+    Path: event:/Metronome
 --- !u!1001 &6507180754467694520
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -808,6 +851,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2850578593379786416, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: sampleRate
+      value: 48000
+      objectReference: {fileID: 0}
     - target: {fileID: 4085720196861218328, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: m_Name
       value: GameplayManager
@@ -830,7 +877,7 @@ PrefabInstance:
       addedObject: {fileID: 1990581571}
     - targetCorrespondingSourceObject: {fileID: 1483414858161088841, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1990581575}
+      addedObject: {fileID: 1990581577}
   m_SourcePrefab: {fileID: 100100000, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
