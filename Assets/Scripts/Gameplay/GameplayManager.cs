@@ -8,6 +8,7 @@ public class GameplayManager : Singleton<GameplayManager>
     public LevelData LevelData;
     public GameplayUIManager UIManager;
     public double vibeLevel = 0.5;
+    public float musicDelayCompensationMs = 0f;
 
     private int totalBars;
     private int currentBar;
@@ -19,24 +20,17 @@ public class GameplayManager : Singleton<GameplayManager>
     private void Start()
     {
         LoadLevelData();
-
-        if (chordProgression == null)
-        {
-            Debug.LogError("GameplayManager: chordProgression is null. Make sure LevelData is assigned and contains a ChordProgression.");
-            totalBars = 0;
-        }
-        else
-        {
-            totalBars = chordProgression.GetTotalBars();
-        }
-
+        totalBars = chordProgression.GetTotalBars();
         currentBar = 0;
+        TimingDetectionManager.Instance.SetBPM(chordProgression.bpm);
+        TimingDetectionManager.Instance.SetBackingMusic(LevelData.backingMusicEvent);
 
-        // Ensure we have a UIManager reference - fall back to singleton if available
-        if (UIManager == null)
-            UIManager = GameplayUIManager.Instance;
+        UIManager = GameplayUIManager.Instance;
+        StartGame();
+    }
 
-        // Start the game flow coroutine instead of blocking the main thread
+    public void StartGame()
+    {
         StartCoroutine(ManageGameFlow());
     }
 
@@ -55,16 +49,10 @@ public class GameplayManager : Singleton<GameplayManager>
 
     private IEnumerator ManageGameFlow()
     {
-        // Start timing and show UI
-        if (TimingDetectionManager.Instance != null)
-            TimingDetectionManager.Instance.StartClock();
-        else
-            Debug.LogWarning("TimingDetectionManager instance not found.");
-
-        if (UIManager != null && UIManager.chordSheetDocument != null)
-            UIManager.chordSheetDocument.rootVisualElement.style.display = UnityEngine.UIElements.DisplayStyle.Flex;
-        else
-            Debug.LogWarning("GameplayManager: UIManager or its chordSheetDocument is not assigned.");
+        yield return new WaitForSeconds(1f);
+        TimingDetectionManager.Instance.StartClock();
+        yield return new WaitForSeconds(musicDelayCompensationMs);
+        StartBackingMusic();
 
         // Wait until we've advanced through all bars. This loop yields each frame so it doesn't block.
         while (currentBar < totalBars)
@@ -72,37 +60,24 @@ public class GameplayManager : Singleton<GameplayManager>
             yield return null;
         }
 
-        if (TimingDetectionManager.Instance != null)
-            TimingDetectionManager.Instance.PauseClock();
-
-        if (UIManager != null && UIManager.chordSheetDocument != null)
-            UIManager.chordSheetDocument.rootVisualElement.style.display = UnityEngine.UIElements.DisplayStyle.None;
+        TimingDetectionManager.Instance.PauseClock();
     }
 
     public void OnBarEvent(int barIndex)
     {
         Debug.Log("OnBarEvent");
         Debug.Log("barIndex: " + barIndex);
+        if (barIndex < 0) return; // Skip count-off bar
 
-        if (chordProgression == null)
-        {
-            Debug.LogError("OnBarEvent: chordProgression is null. Cannot query chord at bar.");
-        }
-        else
-        {
-            var chord = chordProgression.GetChordAtBar(barIndex);
-            Debug.Log("Current chord: " + (chord != null ? chord.ToString() : "(null)"));
-        }
+        var chord = chordProgression.GetChordAtBar(barIndex);
+        Debug.Log("Current chord: " + (chord != null ? chord.ToString() : "(null)"));
 
         currentBar = barIndex;
+        UIManager.UpdateChordSheetUI(currentBar);
+    }
 
-        if (UIManager != null)
-        {
-            UIManager.UpdateChordSheetUI(currentBar);
-        }
-        else
-        {
-            Debug.LogWarning("OnBarEvent: UIManager is null. Cannot update chord sheet UI.");
-        }
+    public void StartBackingMusic()
+    {
+        FMODUnity.RuntimeManager.PlayOneShot(LevelData.backingMusicEvent);
     }
 }

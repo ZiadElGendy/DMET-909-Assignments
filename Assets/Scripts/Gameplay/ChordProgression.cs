@@ -303,6 +303,10 @@ public class ChordProgression : ScriptableObject
 
     public Chord GetChordAtBar(int barIndex)
     {
+        if (barIndex < 0)
+        {
+            return null;
+        }
         int barsCounted = 0;
         foreach (var section in chordSections)
         {

@@ -65,30 +65,4 @@ public class KeyDetection : MonoBehaviour
         // Check if the note name is in the provided set
         return noteSet.Contains(noteName);
     }
-
-    // Optional: GUI for debugging
-    void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 400, 300, 200));
-        GUILayout.BeginVertical("box");
-        GUILayout.Label("=== Key Detection ===");
-
-        if (noteDetection != null && noteDetection.detectedMidi >= 0)
-        {
-            GUILayout.Label($"Detected Note: {lastCheckedNoteName}");
-            GUILayout.Label($"In C Major: {(isCurrentNoteInKey ? "✓ YES" : "✗ NO")}");
-
-            // Visual feedback
-            GUI.color = isCurrentNoteInKey ? Color.green : Color.red;
-            GUILayout.Box(isCurrentNoteInKey ? "IN KEY" : "OUT OF KEY", GUILayout.Height(30));
-            GUI.color = Color.white;
-        }
-        else
-        {
-            GUILayout.Label("No note detected");
-        }
-
-        GUILayout.EndVertical();
-        GUILayout.EndArea();
-    }
 }

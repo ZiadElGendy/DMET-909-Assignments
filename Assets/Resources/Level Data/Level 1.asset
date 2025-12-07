@@ -16,3 +16,10 @@ MonoBehaviour:
   notePitchValidationStrategy: {fileID: 11400000, guid: 829ac461c5b88d34da35a6ab59817868, type: 2}
   noteTimingValidationStrategy: {fileID: 11400000, guid: ab4efe577d7684e4a8069332fd6785bc, type: 2}
   chordProgression: {fileID: 11400000, guid: 2b5e52c75d72dce4aa1b397e4b1fad27, type: 2}
+  backingMusicEvent:
+    Guid:
+      Data1: 823073214
+      Data2: 1132945098
+      Data3: -1629358427
+      Data4: 513946175
+    Path: event:/Music/Gameplay/Level 1

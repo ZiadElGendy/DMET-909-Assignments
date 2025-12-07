@@ -48,6 +48,8 @@ public class NoteDetection : Singleton<NoteDetection>
 
     bool isRecording = false;
 
+    public bool isDebugGUIVisible = false;
+
     void Start()
     {
         circularBuffer = new float[sampleRate * 2];
@@ -274,6 +276,7 @@ public class NoteDetection : Singleton<NoteDetection>
 
     void OnGUI()
     {
+        if (!isDebugGUIVisible) return;
         GUILayout.BeginVertical("box");
         GUILayout.Label("Select Microphone:");
 

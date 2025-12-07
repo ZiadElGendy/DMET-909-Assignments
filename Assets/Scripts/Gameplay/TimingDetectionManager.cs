@@ -10,9 +10,9 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
     [SerializeField] private float windowAfterBeat = 0.1f;
     [SerializeField] private bool enableMetronome = false;
     [SerializeField] private EventReference metronomeEvent;
+    [SerializeField] private EventReference backingMusicEvent;
     [SerializeField] private ScriptableEventInt onBarEvent;
     [SerializeField] private ScriptableEventInt onBeatEvent;
-
 
 
     // Latency compensation in milliseconds. Subtracted from the detected DSP timestamp to compensate
@@ -20,15 +20,17 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
     [SerializeField] private float latencyCompensationMs = 0f;
 
     private bool isPlaying;
+    private bool isMusicPlaying;
     private double nextBeatTime;
     private double lastBeatTime;
     private double beatInterval;
     private int currentBeat = 0;
-    private int curentBar = 0;
-    public bool isCountOff = true;
+    private int curentBar = -1;
     public bool isOnBeat;
 
-    void Start() => beatInterval = 60.0 / bpm;
+    void Start(){
+        beatInterval = 60.0 / bpm;
+    }
 
     void Update()
     {
@@ -37,13 +39,12 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
             lastBeatTime = nextBeatTime;
             currentBeat = (currentBeat + 1) % beatsPerMeasure;
             if (enableMetronome) RuntimeManager.PlayOneShot(metronomeEvent);
-            if(isCountOff && GetCurrentBar() >= 0) isCountOff = false;
             nextBeatTime += beatInterval;
             onBeatEvent.Raise(currentBeat);
             if (currentBeat == 0)
             {
-                curentBar++;
                 onBarEvent.Raise(GetCurrentBar());
+                curentBar++;
             }
         }
     }
@@ -116,4 +117,15 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
     public int GetCurrentBar() => curentBar;
 
     public float GetBeatProgress() => isPlaying ? (float)((AudioSettings.dspTime - (nextBeatTime - beatInterval)) / beatInterval) : 0f;
+
+    public void SetBPM(float newBPM)
+    {
+        bpm = newBPM;
+        beatInterval = 60.0f / bpm;
+    }
+
+    public void SetBackingMusic(EventReference backingMusicEventRef)
+    {
+        backingMusicEvent = backingMusicEventRef;
+    }
 }

@@ -28,10 +28,10 @@ namespace UI
             {
                 int barIndex = windowStart + i;
                 var chord = chordProgression.GetChordAtBar(barIndex);
-
+                
                 // Get chord name or "//" for continuation bars
                 string chordName = GetChordNameForBar(barIndex);
-
+                
                 // Update the label text
                 var label = chordSlots[i].Q<Label>();
                 if (label != null)
@@ -65,7 +65,7 @@ namespace UI
             for (int i = 0; i < 8; i++)
             {
                 chordSlots[i] = root.Q<VisualElement>("Chord" + (i + 1));
-
+                
                 if (chordSlots[i] == null)
                 {
                     Debug.LogWarning($"Could not find Chord{i + 1} element in UI.");

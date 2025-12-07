@@ -4398,6 +4398,7 @@ MonoBehaviour:
   LevelData: {fileID: 11400000, guid: 905c90a8e352dfa4fa773875e2e5162f, type: 2}
   UIManager: {fileID: 408273846}
   vibeLevel: 0.5
+  musicDelayCompensationMs: 0.22
 --- !u!114 &1745130351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4670,6 +4671,10 @@ PrefabInstance:
       propertyPath: onBeatEvent
       value: 
       objectReference: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: metronomeEvent.Path
+      value: event:/SFX/Metronome
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

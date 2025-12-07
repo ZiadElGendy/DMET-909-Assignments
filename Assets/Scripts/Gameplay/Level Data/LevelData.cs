@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using FMODUnity;
 
 namespace Gameplay.Level_Data
 {
@@ -9,5 +10,6 @@ namespace Gameplay.Level_Data
         public NotePitchValidationStrategy notePitchValidationStrategy;
         public NoteTimingValidationStrategy noteTimingValidationStrategy;
         public ChordProgression chordProgression;
+        public EventReference backingMusicEvent;
     }
 }
