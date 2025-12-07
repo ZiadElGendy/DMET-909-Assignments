@@ -9,6 +9,10 @@ namespace UI
         private ChordProgression chordProgression;
         private VisualElement[] chordSlots = new VisualElement[8];
 
+        public GameObject vibeMeter;
+        public Transform vibeMeterMin;
+        public Transform vibeMeterMax;
+
         private void Start()
         {
             chordProgression = GameplayManager.Instance.LevelData.chordProgression;
@@ -105,6 +109,13 @@ namespace UI
             }
 
             return "";
+        }
+
+        public void UpdateVibeMeterUI(float vibeLevel)
+        {
+            // Interpolate position between min and max
+            Vector3 newPosition = Vector3.Lerp(vibeMeterMin.position, vibeMeterMax.position, vibeLevel);
+            vibeMeter.transform.position = newPosition;
         }
     }
 }

@@ -67,10 +67,14 @@ public class NoteDetectionManager : Singleton<NoteDetectionManager>
     // Track previous RMS for attack detection
     private float previousRMS = 0f;
 
+    public PlayerSettings settings;
+
     void Start()
     {
         circularBuffer = new float[sampleRate * 2];
         readBuffer = new float[8192];
+        recordDriverIndex = settings.selectedAudioDeviceIndex;
+
         InitializeFMOD();
     }
 
@@ -84,6 +88,7 @@ public class NoteDetectionManager : Singleton<NoteDetectionManager>
             int numConnected = 0;
             coreSystem.getRecordNumDrivers(out numDrivers, out numConnected);
             Debug.Log($"FMOD: Found {numConnected} recording devices");
+            SelectDevice(recordDriverIndex);
         }
     }
 
@@ -364,7 +369,6 @@ public class NoteDetectionManager : Singleton<NoteDetectionManager>
             GUILayout.Label("MIDI: " + detectedMidi);
             GUILayout.Label("Note: " + detectedNote);
 
-            // Show threshold info
             GUILayout.Space(5);
             GUILayout.Label($"Attack Threshold: {attackThreshold:F2}");
             GUILayout.Label($"Noise Gate: {noiseGateThreshold:F2}");

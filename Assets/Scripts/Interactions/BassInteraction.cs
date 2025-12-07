@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BassInteraction : MonoBehaviour
 {
@@ -15,12 +16,7 @@ public class BassInteraction : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                isMenuOpen = true;
-                menuUI.SetActive(isMenuOpen);
-                _playerController.SetCanMove(!isMenuOpen);
-
-                oldCamera.enabled = false;
-                newCamera.enabled = true;
+                SceneManager.LoadScene("Level1");
             }
         }
     }

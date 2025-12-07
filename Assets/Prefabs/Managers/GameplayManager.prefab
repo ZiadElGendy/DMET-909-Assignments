@@ -47,7 +47,7 @@ MonoBehaviour:
   bpm: 90
   beatsPerMeasure: 4
   windowBeforeBeat: 0.1
-  windowAfterBeat: 0.3
+  windowAfterBeat: 0.25
   enableMetronome: 1
   metronomeEvent:
     Guid:
@@ -55,11 +55,20 @@ MonoBehaviour:
       Data2: 1148465446
       Data3: 1924855428
       Data4: -284177994
-    Path: event:/Metronome
-  onBarEvent: {fileID: 0}
-  onBeatEvent: {fileID: 0}
+    Path: event:/SFX/Metronome
+  backingMusicEvent:
+    Guid:
+      Data1: 823073214
+      Data2: 1132945098
+      Data3: -1629358427
+      Data4: 513946175
+    Path: event:/Music/Gameplay/Level 1
+  onBarEvent: {fileID: 11400000, guid: 777882ec1b9797249b57f2fabe1e3adf, type: 2}
+  onBeatEvent: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
+  onTimingWindowOpen: {fileID: 11400000, guid: 4dcbaf7d8f1d9894d8d2f81022143540, type: 2}
+  onTimingWindowClose: {fileID: 11400000, guid: 0174b0d173e357e47ab8a1a0eec23860, type: 2}
+  musicStartOffsetMs: 167
   latencyCompensationMs: 0
-  isCountOff: 1
   isOnBeat: 0
 --- !u!1 &3422969835404833419
 GameObject:
@@ -108,9 +117,15 @@ MonoBehaviour:
   sampleRate: 48000
   windowSize: 4096
   yinThreshold: 0.3
+  attackThreshold: 0.1
+  noiseGateThreshold: 0.05
+  attackLookback: 512
   detectedFrequency: 0
   detectedMidi: 0
   detectedNote: 
+  isDebugGUIVisible: 1
+  onNotePlayedDetected: {fileID: 11400000, guid: 002e59b282557f0429f993e2729b8ec9, type: 2}
+  settings: {fileID: 11400000, guid: af95c4d2117bd784598f9c3c979a956b, type: 2}
 --- !u!1 &4085720196861218328
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,6 +135,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1322732539474267176}
+  - component: {fileID: 8984795087103289163}
+  - component: {fileID: 4720239037245028752}
+  - component: {fileID: 4798635934383097810}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
@@ -141,51 +159,141 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3777409136325673137}
-  - {fileID: 2841506047182032242}
   - {fileID: 33105274360669005}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8820517792465585542
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2841506047182032242}
-  - component: {fileID: 6128800113680953513}
-  m_Layer: 0
-  m_Name: KeyDetectionManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2841506047182032242
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8820517792465585542}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1322732539474267176}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6128800113680953513
+--- !u!114 &8984795087103289163
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8820517792465585542}
+  m_GameObject: {fileID: 4085720196861218328}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85062f3b5c724a14809e4a727df7ca49, type: 3}
+  m_Script: {fileID: 11500000, guid: 24352c22290546bf938a711e952b0349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LevelData: {fileID: 11400000, guid: 905c90a8e352dfa4fa773875e2e5162f, type: 2}
+  UIManager: {fileID: 0}
+  vibeLevel: 0.5
+  musicDelayCompensationMs: 0.22
+  inTimingWindow: 0
+  pitchValid: 0
+  timingValid: 0
+  fulfilledNoteInTimingWindow: 0
+--- !u!114 &4720239037245028752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4085720196861218328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f30bb439e6d7dc94489cd1be18593b0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _binding: 0
+  _disableAfterSubscribing: 0
+  _eventResponses:
+  - Delay: 0
+    _scriptableEvent: {fileID: 11400000, guid: 777882ec1b9797249b57f2fabe1e3adf, type: 2}
+    _response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8984795087103289163}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnBarEvent
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    _scriptableEvent: {fileID: 11400000, guid: 002e59b282557f0429f993e2729b8ec9, type: 2}
+    _response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8984795087103289163}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnNotePlayDetected
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    _scriptableEvent: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
+    _response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8984795087103289163}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnBeatEvent
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &4798635934383097810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4085720196861218328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93ba61543949824db31c7cb89b4f009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _binding: 0
+  _disableAfterSubscribing: 0
+  _eventResponses:
+  - Delay: 0
+    ScriptableEvent: {fileID: 11400000, guid: 4dcbaf7d8f1d9894d8d2f81022143540, type: 2}
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8984795087103289163}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnTimingWindowOpen
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    ScriptableEvent: {fileID: 11400000, guid: 0174b0d173e357e47ab8a1a0eec23860, type: 2}
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8984795087103289163}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnTimingWindowClose
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2

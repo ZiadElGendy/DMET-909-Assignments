@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Background" style="flex-grow: 1; background-color: rgb(38, 38, 108); margin-top: 0%; margin-right: 0%; margin-bottom: 0%; margin-left: 0%; padding-top: 20%; padding-right: 20%; padding-bottom: 20%; padding-left: 20%;">
+        <ui:Label text="Take A Walk!" style="justify-content: center; align-items: center; align-self: center; -unity-font-style: bold; font-size: 64px; color: rgb(255, 255, 255);" />
+        <ui:Button text="Start" name="Start" style="margin-top: 20px; margin-right: 20px; margin-bottom: 20px; margin-left: 20px; padding-top: 50px; padding-right: 50px; padding-bottom: 50px; padding-left: 50px; font-size: 32px;" />
+        <ui:Button text="Exit" name="Exit" style="margin-top: 20px; margin-right: 20px; margin-bottom: 20px; margin-left: 20px; padding-top: 50px; padding-right: 50px; padding-bottom: 50px; padding-left: 50px; font-size: 32px;" />
+    </ui:VisualElement>
+</ui:UXML>

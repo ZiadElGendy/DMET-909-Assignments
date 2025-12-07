@@ -9,7 +9,7 @@ public class GameplayManager : Singleton<GameplayManager>
 {
     public LevelData LevelData;
     public GameplayUIManager UIManager;
-    public double vibeLevel = 0.5;
+    public float vibeLevel = 0.5f;
     public float musicDelayCompensationMs = 0f;
 
     private int totalBars;
@@ -41,6 +41,7 @@ public class GameplayManager : Singleton<GameplayManager>
         TimingDetectionManager.Instance.SetBackingMusic(LevelData.backingMusicEvent);
 
         UIManager = GameplayUIManager.Instance;
+        StartGame();
     }
 
     public void StartGame()
@@ -198,6 +199,8 @@ public class GameplayManager : Singleton<GameplayManager>
             OnNotePlayedUnuccessfully();
         }
 
+        UIManager.UpdateVibeMeterUI(vibeLevel);
+
         inTimingWindow = false;
         timingValid = 0;
         pitchValid = 0;
@@ -207,21 +210,21 @@ public class GameplayManager : Singleton<GameplayManager>
     public void OnNotePlayedSuccessfully()
     {
         Debug.Log("★★★ Correct Note Played! ★★★");
-        vibeLevel = Math.Min(vibeLevel + 0.025, 1);
+        vibeLevel = Math.Min(vibeLevel + 0.025f, 1);
         Debug.Log($"Vibe Level: {vibeLevel:F3}");
     }
 
     public void OnNotePlayedUnuccessfully()
     {
         Debug.Log("✗ Incorrect Note Played");
-        vibeLevel = Math.Max(vibeLevel - 0.05, 0);
+        vibeLevel = Math.Max(vibeLevel - 0.05f, 0);
         Debug.Log($"Vibe Level: {vibeLevel:F3}");
     }
 
     public void OnBarSkipped()
     {
         Debug.Log("✗✗ No Notes played in Bar");
-        vibeLevel = Math.Max(vibeLevel - 0.1, 0);
+        vibeLevel = Math.Max(vibeLevel - 0.1f, 0);
         Debug.Log($"Vibe Level: {vibeLevel:F3}");
     }
 }
