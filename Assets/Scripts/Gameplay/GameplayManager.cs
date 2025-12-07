@@ -21,6 +21,7 @@ public class GameplayManager : Singleton<GameplayManager>
     {
         LoadLevelData();
         totalBars = chordProgression.GetTotalBars();
+        Debug.Log($"Total Bars: {totalBars}");
         currentBar = 0;
         TimingDetectionManager.Instance.SetBPM(chordProgression.bpm);
         TimingDetectionManager.Instance.SetBackingMusic(LevelData.backingMusicEvent);
@@ -51,8 +52,8 @@ public class GameplayManager : Singleton<GameplayManager>
     {
         yield return new WaitForSeconds(1f);
         TimingDetectionManager.Instance.StartClock();
-        yield return new WaitForSeconds(musicDelayCompensationMs);
-        StartBackingMusic();
+        // yield return new WaitForSeconds(musicDelayCompensationMs);
+        // StartBackingMusic();
 
         // Wait until we've advanced through all bars. This loop yields each frame so it doesn't block.
         while (currentBar < totalBars)

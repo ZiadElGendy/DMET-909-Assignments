@@ -4672,8 +4672,32 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
     - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: musicStartOffsetMs
+      value: 167
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: metronomeEvent.Path
       value: event:/SFX/Metronome
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: backingMusicEvent.Path
+      value: event:/Music/Gameplay/Level 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: backingMusicEvent.Guid.Data1
+      value: 823073214
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: backingMusicEvent.Guid.Data2
+      value: 1132945098
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: backingMusicEvent.Guid.Data3
+      value: -1629358427
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: backingMusicEvent.Guid.Data4
+      value: 513946175
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
