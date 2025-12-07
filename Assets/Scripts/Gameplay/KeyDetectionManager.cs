@@ -6,7 +6,7 @@ using System.Linq;
 
 public class KeyDetection : MonoBehaviour
 {
-    private NoteDetection noteDetection;
+    private NoteDetectionManager _noteDetectionManager;
 
     // Current detected state
     public bool isCurrentNoteInKey { get; private set; }
@@ -17,7 +17,7 @@ public class KeyDetection : MonoBehaviour
 
     void Start()
     {
-        noteDetection = NoteDetection.Instance;
+        _noteDetectionManager = NoteDetectionManager.Instance;
 
         // Initialize C Major scale: C, D, E, F, G, A, B
         cMajorScale = new HashSet<NoteName>
@@ -34,14 +34,14 @@ public class KeyDetection : MonoBehaviour
 
     void Update()
     {
-        if (noteDetection == null || noteDetection.detectedMidi < 0)
+        if (_noteDetectionManager == null || _noteDetectionManager.detectedMidi < 0)
         {
             isCurrentNoteInKey = false;
             return;
         }
 
         // Get the MIDI note from NoteDetection
-        int midiNoteNumber = noteDetection.detectedMidi;
+        int midiNoteNumber = _noteDetectionManager.detectedMidi;
 
         // Convert to DryWetMIDI Note
         var note = Melanchall.DryWetMidi.MusicTheory.Note.Get((SevenBitNumber)midiNoteNumber);

@@ -4399,6 +4399,10 @@ MonoBehaviour:
   UIManager: {fileID: 408273846}
   vibeLevel: 0.5
   musicDelayCompensationMs: 0.22
+  inTimingWindow: 0
+  pitchValid: 0
+  timingValid: 0
+  fulfilledNoteInTimingWindow: 0
 --- !u!114 &1745130351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4423,6 +4427,89 @@ MonoBehaviour:
           m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
           m_MethodName: OnBarEvent
           m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    _scriptableEvent: {fileID: 11400000, guid: 002e59b282557f0429f993e2729b8ec9, type: 2}
+    _response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1745130350}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnNotePlayDetected
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    _scriptableEvent: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
+    _response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1745130350}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnBeatEvent
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &1745130352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745130348}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93ba61543949824db31c7cb89b4f009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _binding: 0
+  _disableAfterSubscribing: 0
+  _eventResponses:
+  - Delay: 0
+    ScriptableEvent: {fileID: 11400000, guid: 4dcbaf7d8f1d9894d8d2f81022143540, type: 2}
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1745130350}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnTimingWindowOpen
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Delay: 0
+    ScriptableEvent: {fileID: 11400000, guid: 0174b0d173e357e47ab8a1a0eec23860, type: 2}
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1745130350}
+          m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+          m_MethodName: OnTimingWindowClose
+          m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -4659,9 +4746,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2850578593379786416, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: isDebugGUIVisible
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850578593379786416, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: noiseGateThreshold
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 2850578593379786416, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: onNotePlayedDetected
+      value: 
+      objectReference: {fileID: 11400000, guid: 002e59b282557f0429f993e2729b8ec9, type: 2}
     - target: {fileID: 4085720196861218328, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: m_Name
       value: GameplayManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: bpm
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: onBarEvent
@@ -4672,13 +4775,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: cdef6614ab4071e4dafb3445d53953ae, type: 2}
     - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: windowAfterBeat
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: musicStartOffsetMs
       value: 167
       objectReference: {fileID: 0}
     - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: onTimingWindowOpen
+      value: 
+      objectReference: {fileID: 11400000, guid: 4dcbaf7d8f1d9894d8d2f81022143540, type: 2}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: metronomeEvent.Path
       value: event:/SFX/Metronome
       objectReference: {fileID: 0}
+    - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      propertyPath: onTimingWindowClose
+      value: 
+      objectReference: {fileID: 11400000, guid: 0174b0d173e357e47ab8a1a0eec23860, type: 2}
     - target: {fileID: 6217213361322493242, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       propertyPath: backingMusicEvent.Path
       value: event:/Music/Gameplay/Level 1
@@ -4700,7 +4815,8 @@ PrefabInstance:
       value: 513946175
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8820517792465585542, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4085720196861218328, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
@@ -4709,6 +4825,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4085720196861218328, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1745130351}
+    - targetCorrespondingSourceObject: {fileID: 4085720196861218328, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1745130352}
   m_SourcePrefab: {fileID: 100100000, guid: aacfedb868a19434ab06fc7541390e88, type: 3}
 --- !u!1 &1779000436
 GameObject:

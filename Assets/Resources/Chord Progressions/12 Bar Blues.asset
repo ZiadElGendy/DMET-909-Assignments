@@ -15,7 +15,7 @@ MonoBehaviour:
   songName: 12 Bar Blues
   artist: 
   key: C
-  numLoops: 4
+  numLoops: 3
   bpm: 120
   beatsPerBar: 4
   chordSections:

@@ -22,10 +22,11 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
     private FMOD.Studio.EventInstance musicInstance;
     private double musicStartDspTime;
     private double beatInterval;
-    private int lastProcessedBeat = -1; // Track which beat we last processed
+    private int lastProcessedBeat = -1;
     private int currentBeat = 0;
-    private int curentBar = -1; // Start at -1 to account for count off
+    private int curentBar = -1;
     public bool isOnBeat;
+    private bool wasInTimingWindow = false; // Track timing window state
 
     void Start()
     {
@@ -36,7 +37,6 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
     {
         if (!isPlaying) return;
 
-        // Apply the offset correction
         double elapsedTime = AudioSettings.dspTime - musicStartDspTime - (musicStartOffsetMs / 1000.0);
         int totalBeatsElapsed = Mathf.FloorToInt((float)(elapsedTime / beatInterval));
 
@@ -52,10 +52,26 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
 
             if (currentBeat == 0)
             {
-                curentBar = totalBeatsElapsed / beatsPerMeasure;
                 onBarEvent.Raise(GetCurrentBar());
+                curentBar = totalBeatsElapsed / beatsPerMeasure;
             }
         }
+
+        // Check if we're in the timing window and raise events on transitions
+        bool currentlyInWindow = IsOnBeat();
+
+        if (currentlyInWindow && !wasInTimingWindow)
+        {
+            // Just entered timing window
+            onTimingWindowOpen?.Raise();
+        }
+        else if (!currentlyInWindow && wasInTimingWindow)
+        {
+            // Just exited timing window
+            onTimingWindowClose?.Raise();
+        }
+
+        wasInTimingWindow = currentlyInWindow;
     }
 
     public void StartClock()
@@ -64,10 +80,10 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
         musicStartDspTime = AudioSettings.dspTime;
         lastProcessedBeat = -1;
         currentBeat = 0;
-        curentBar = 0;
+        curentBar = -1;
         isPlaying = true;
+        wasInTimingWindow = false;
 
-        // Create and start music instance (only once)
         if (musicInstance.isValid())
         {
             musicInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
@@ -148,7 +164,6 @@ public class TimingDetectionManager : Singleton<TimingDetectionManager>
 
         return withinWindow;
     }
-
 
     public int GetCurrentBeat() => currentBeat;
 

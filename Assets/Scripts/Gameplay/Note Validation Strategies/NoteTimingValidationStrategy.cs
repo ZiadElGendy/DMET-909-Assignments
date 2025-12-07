@@ -2,5 +2,5 @@
 
 public abstract class NoteTimingValidationStrategy : ScriptableObject
 {
-    public abstract bool IsValidTiming(double dspTimestamp);
+    public abstract int IsValidTiming(bool noteWasPlayed, int currentBeat);
 }

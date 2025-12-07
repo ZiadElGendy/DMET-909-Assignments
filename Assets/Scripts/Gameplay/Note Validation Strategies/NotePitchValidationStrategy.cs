@@ -3,5 +3,5 @@ using UnityEngine;
 
 public abstract class NotePitchValidationStrategy : ScriptableObject
 {
-    public abstract bool IsValidPitch(int midiNote, Chord currentChord);
+    public abstract int IsValidPitch(int midiNote, Chord currentChord);
 }
